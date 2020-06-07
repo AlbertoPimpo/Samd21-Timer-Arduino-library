@@ -7,6 +7,17 @@ on:
     branches: [ master, dev ]
 
 jobs:
+  codacy-analysis-cli:
+    runs-on: ubuntu-latest
+    name: codacy-analysis-cli
+    steps:
+      - uses: actions/checkout@master
+      - name: Run codacy-analysis-cli
+        uses: mrfyda/codacy-analysis-cli-action@master
+        with:
+          project-token: ${{ secrets.CODACY_PROJECT_TOKEN }}
+
+     
   build:
     runs-on: ubuntu-latest
     strategy:
