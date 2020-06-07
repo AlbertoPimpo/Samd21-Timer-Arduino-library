@@ -30,6 +30,7 @@ jobs:
 
     - name: Run Arduino CLI
       run: |
+        arduino-cli core update-index
         arduino-cli board listall zero
         echo "arduino-cli compile -b arduino:samd:zero"
 
