@@ -96,3 +96,5 @@ class InputChecker {
         bool check_frequency(double freq, TimerResolution res);
         bool check_compatibility(TimerInfo* timerinfo);
 };
+
+extern Samd21TimerClass Timer;
