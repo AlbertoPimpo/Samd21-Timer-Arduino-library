@@ -22,7 +22,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        example: [examples/]
+        example: [examples/empty_sketch.ino]
 
     steps:
     - uses: actions/checkout@v1
