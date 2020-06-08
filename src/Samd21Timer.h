@@ -25,7 +25,7 @@ template <
 class ITimer {
     public:
         virtual void enable(TimerNumber timer, double freq, void(*callback)(),  Priority priority, GeneralClock gclk) = 0;  //Automatic selection of the timer resolution 
-        virtual void enable(TimerNumber timer, double freq, void(*callback)(), TimerResolution res, uint8_t priority, GeneralClock gclk) = 0; //Manual selection of timer resolution
+        virtual void enable(TimerNumber timer, double freq, void(*callback)(), TimerResolution res, Priority priority, GeneralClock gclk) = 0; //Manual selection of timer resolution
         virtual void disable(TimerNumber timer) = 0;
         virtual void disable_check() = 0; //permit to use params that are unknown at compile time
         virtual void unsafe_mode() = 0; //let use timer used by system library
