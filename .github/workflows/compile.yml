@@ -29,7 +29,7 @@ jobs:
         PLATFORMIO_CI_SRC: ${{ matrix.example }}
         
     - name: Install Protoc
-      uses: arduino/setup-protoc@1.1.0
+      uses: arduino/setup-protoc@master
       with:
         version: 3.x
         include-pre-release: false
