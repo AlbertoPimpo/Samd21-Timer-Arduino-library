@@ -60,6 +60,9 @@ class IChecker {
  ****************************************************************/
 
 
+#ifdef __SAMD21G18A__ 
+
+
 typedef enum{
     TIMER_0 = 0,
     TIMER_1 = 1,
@@ -150,6 +153,6 @@ class CheckerSamd21 : public IChecker<TimerResolutionSamd21, TimerInfoSamd21> {
 };
 
 
-#ifdef __SAMD21G18A__ 
 extern Samd21TimerClass Timer;
+
 #endif
