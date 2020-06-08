@@ -27,11 +27,14 @@ jobs:
       run: platformio ci --lib="." --board=zeroUSB
       env:
         PLATFORMIO_CI_SRC: ${{ matrix.example }}
-
-    - name: Setup Arduino CLI
-      uses: arduino/setup-arduino-cli@v1.0.0
+        
+    - name: Install Protoc
+      uses: arduino/setup-protoc@master
       with:
         repo-token: ${{ secrets.GITHUB_TOKEN }}
+    
+    - name: Setup Arduino CLI
+      uses: arduino/setup-arduino-cli@v1.0.0
 
 
     - name: Run Arduino CLI
