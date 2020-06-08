@@ -29,12 +29,11 @@ jobs:
         PLATFORMIO_CI_SRC: ${{ matrix.example }}
         
     - name: Install Protoc
-      uses: arduino/setup-protoc@master
+      uses: arduino/setup-protoc@1.1.0
       with:
+        version: 3.x
+        include-pre-release: false
         repo-token: ${{ secrets.GITHUB_TOKEN }}
-    
-    - name: Setup Arduino CLI
-      uses: arduino/setup-arduino-cli@v1.0.0
 
 
     - name: Run Arduino CLI
