@@ -130,7 +130,7 @@ class Samd21TimerClass : public ITimer<
     uint8_t> {
     public:
         void enable(TimerNumberSamd21 timer, double freq, void(*callback)(),  uint8_t priority = 0, GeneralClockSamd21 gclk = GCLK_5);  //Automatic selection of the timer resolution 
-        void enable(TimerNumberSamd21 timer, double freq, void(*callback)(), TimerResolutionSamd21 res = RESOLUTION_16_BIT, uint8_t priority = 0, GeneralClockSamd21 gclk = GCLK_5); //Manual selection of timer resolution
+        void enable(TimerNumberSamd21 timer, double freq, void(*callback)(), TimerResolutionSamd21 res, uint8_t priority = 0, GeneralClockSamd21 gclk = GCLK_5); //Manual selection of timer resolution
         void disable(TimerNumberSamd21 timer);
         void disable_check(); //permit to use params that are unknown at compile time
         void unsafe_mode(); //enable usage of timer 0 and timer 1
