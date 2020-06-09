@@ -1,6 +1,5 @@
 #include <Arduino.h>
 
-
 // Used StaticAssert as a specialization of bool template instead of built-in one in order to grant 
 // back compatibility with old standards
 template <bool b>
@@ -63,8 +62,8 @@ class IChecker {
  ****************************************************************/
 
 
-//#ifdef __SAMD21G18A__ 
-#define CPU_CLK 48000000
+#ifdef __SAMD21G18A__ 
+#define SAMD21_CLK 48000000
 
 typedef enum{
     TIMER_0 = 0,
@@ -172,4 +171,4 @@ void TC4_Handler();
 void TC5_Handler();
 
 
-//#endif
+#endif

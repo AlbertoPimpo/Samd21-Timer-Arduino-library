@@ -1,5 +1,4 @@
 #include "Samd21Timer.h"
-
 //Implementation of Samd21TimerClass Methods
 
 #ifdef __SAMD21G18A__
@@ -90,28 +89,28 @@ TimerParamsSamd21 Samd21TimerClass::getTimerParams(double freq, TimerResolutionS
 
             if ((freq < 24000000) && (freq > 800)) {
                 params.prescaler = TC_CTRLA_PRESCALER_DIV1;
-                params.compare = CPU_CLK/freq;
+                params.compare = SAMD21_CLK/freq;
             } else if (freq > 400) {
                 params.prescaler = TC_CTRLA_PRESCALER_DIV2;
-                params.compare = (CPU_CLK/2)/freq;
+                params.compare = (SAMD21_CLK/2)/freq;
             } else if (freq > 200) {
                 params.prescaler = TC_CTRLA_PRESCALER_DIV4;
-                params.compare = (CPU_CLK/4)/freq;
+                params.compare = (SAMD21_CLK/4)/freq;
             } else if (freq > 100) {
                 params.prescaler = TC_CTRLA_PRESCALER_DIV8;
-                params.compare = (CPU_CLK/8)/freq;
+                params.compare = (SAMD21_CLK/8)/freq;
             } else if (freq > 50) {
                 params.prescaler = TC_CTRLA_PRESCALER_DIV16;
-                params.compare = (CPU_CLK/16)/freq;
+                params.compare = (SAMD21_CLK/16)/freq;
             } else if (freq > 12) {
                 params.prescaler = TC_CTRLA_PRESCALER_DIV64;
-                params.compare = (CPU_CLK/64)/freq;
+                params.compare = (SAMD21_CLK/64)/freq;
             } else if (freq > 3) {
                 params.prescaler = TC_CTRLA_PRESCALER_DIV256;
-                params.compare = (CPU_CLK/256)/freq;
+                params.compare = (SAMD21_CLK/256)/freq;
             } else if (freq > 0.75){
                 params.prescaler = TC_CTRLA_PRESCALER_DIV1024;
-                params.compare = (CPU_CLK/1024)/freq;
+                params.compare = (SAMD21_CLK/1024)/freq;
             } 
 
             break;
@@ -121,28 +120,28 @@ TimerParamsSamd21 Samd21TimerClass::getTimerParams(double freq, TimerResolutionS
 
             if (freq > 0.02) {
                 params.prescaler = TC_CTRLA_PRESCALER_DIV1;
-                params.compare = CPU_CLK/freq;
+                params.compare = SAMD21_CLK/freq;
             } else if (freq > 0.006) {
                 params.prescaler = TC_CTRLA_PRESCALER_DIV2;
-                params.compare = (CPU_CLK/2)/freq;
+                params.compare = (SAMD21_CLK/2)/freq;
             } else if (freq > 0.003) {
                 params.prescaler = TC_CTRLA_PRESCALER_DIV4;
-                params.compare = (CPU_CLK/4)/freq;
+                params.compare = (SAMD21_CLK/4)/freq;
             } else if (freq > 0.0015) {
                 params.prescaler = TC_CTRLA_PRESCALER_DIV8;
-                params.compare = (CPU_CLK/8)/freq;
+                params.compare = (SAMD21_CLK/8)/freq;
             } else if (freq > 0.0008) {
                 params.prescaler = TC_CTRLA_PRESCALER_DIV16;
-                params.compare = (CPU_CLK/16)/freq;
+                params.compare = (SAMD21_CLK/16)/freq;
             } else if (freq > 0.0002) {
                 params.prescaler = TC_CTRLA_PRESCALER_DIV64;
-                params.compare = (CPU_CLK/64)/freq;
+                params.compare = (SAMD21_CLK/64)/freq;
             } else if (freq > 0.00005) {
                 params.prescaler = TC_CTRLA_PRESCALER_DIV256;
-                params.compare = (CPU_CLK/256)/freq;
+                params.compare = (SAMD21_CLK/256)/freq;
             } else if (freq >= 0.000011){
                 params.prescaler = TC_CTRLA_PRESCALER_DIV1024;
-                params.compare = (CPU_CLK/1024)/freq;
+                params.compare = (SAMD21_CLK/1024)/freq;
             } 
 
             break;
