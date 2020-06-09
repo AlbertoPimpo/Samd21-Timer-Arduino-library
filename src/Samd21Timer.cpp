@@ -3,6 +3,8 @@
 //Implementation of Samd21TimerClass Methods
 
 #ifdef __SAMD21G18A__
+
+
 void Samd21TimerClass::enable(TimerNumberSamd21 timer, double freq, void(*callback)(),  uint8_t priority, GeneralClockSamd21 gclk){
     if(freq >= 0.75)
         this->enable(timer, freq, callback, RESOLUTION_16_BIT, priority, gclk);
@@ -80,6 +82,143 @@ void Samd21TimerClass::enable(TimerNumberSamd21 timer, double freq, void(*callba
 }
 
 
+TimerParamsSamd21 Samd21TimerClass::getTimerParams(double freq, TimerResolutionSamd21 res){
+    TimerParamsSamd21 params;
+    switch (res){
+        case RESOLUTION_16_BIT:
+            params.modeCount = TC_CTRLA_MODE_COUNT16;
+
+            if ((freq < 24000000) && (freq > 800)) {
+                params.prescaler = TC_CTRLA_PRESCALER_DIV1;
+                params.compare = CPU_CLK/freq;
+            } else if (freq > 400) {
+                params.prescaler = TC_CTRLA_PRESCALER_DIV2;
+                params.compare = (CPU_CLK/2)/freq;
+            } else if (freq > 200) {
+                params.prescaler = TC_CTRLA_PRESCALER_DIV4;
+                params.compare = (CPU_CLK/4)/freq;
+            } else if (freq > 100) {
+                params.prescaler = TC_CTRLA_PRESCALER_DIV8;
+                params.compare = (CPU_CLK/8)/freq;
+            } else if (freq > 50) {
+                params.prescaler = TC_CTRLA_PRESCALER_DIV16;
+                params.compare = (CPU_CLK/16)/freq;
+            } else if (freq > 12) {
+                params.prescaler = TC_CTRLA_PRESCALER_DIV64;
+                params.compare = (CPU_CLK/64)/freq;
+            } else if (freq > 3) {
+                params.prescaler = TC_CTRLA_PRESCALER_DIV256;
+                params.compare = (CPU_CLK/256)/freq;
+            } else if (freq > 0.75){
+                params.prescaler = TC_CTRLA_PRESCALER_DIV1024;
+                params.compare = (CPU_CLK/1024)/freq;
+            } 
+
+            break;
+        
+        case RESOLUTION_32_BIT:
+            params.modeCount = TC_CTRLA_MODE_COUNT16;
+
+            if (freq > 0.02) {
+                params.prescaler = TC_CTRLA_PRESCALER_DIV1;
+                params.compare = CPU_CLK/freq;
+            } else if (freq > 0.006) {
+                params.prescaler = TC_CTRLA_PRESCALER_DIV2;
+                params.compare = (CPU_CLK/2)/freq;
+            } else if (freq > 0.003) {
+                params.prescaler = TC_CTRLA_PRESCALER_DIV4;
+                params.compare = (CPU_CLK/4)/freq;
+            } else if (freq > 0.0015) {
+                params.prescaler = TC_CTRLA_PRESCALER_DIV8;
+                params.compare = (CPU_CLK/8)/freq;
+            } else if (freq > 0.0008) {
+                params.prescaler = TC_CTRLA_PRESCALER_DIV16;
+                params.compare = (CPU_CLK/16)/freq;
+            } else if (freq > 0.0002) {
+                params.prescaler = TC_CTRLA_PRESCALER_DIV64;
+                params.compare = (CPU_CLK/64)/freq;
+            } else if (freq > 0.00005) {
+                params.prescaler = TC_CTRLA_PRESCALER_DIV256;
+                params.compare = (CPU_CLK/256)/freq;
+            } else if (freq >= 0.000011){
+                params.prescaler = TC_CTRLA_PRESCALER_DIV1024;
+                params.compare = (CPU_CLK/1024)/freq;
+            } 
+
+            break;
+
+        case RESOLUTION_8_BIT:
+        default:
+            //TO DO
+            break;
+        
+    };
+
+    return params;
+}
+
+
+void Samd21TimerClass::setGeneralClock(TimerNumberSamd21 timer, GeneralClockSamd21 gclk){  
+    unsigned long clockGenCtrlId;
+    unsigned long clockGenCtrlGen;
+    
+    switch (timer){
+        case TIMER_0:
+        case TIMER_1:
+            clockGenCtrlId = GCLK_CLKCTRL_ID_TCC0_TCC1;
+            break;
+        case TIMER_2:
+        case TIMER_3:
+            clockGenCtrlId = GCLK_CLKCTRL_ID_TCC2_TC3;
+            break;
+        case TIMER_4:
+        case TIMER_5:
+        default:
+            clockGenCtrlId = GCLK_CLKCTRL_ID_TC4_TC5;
+            break;
+    };
+
+    switch(gclk){
+        case GCLK_0:
+            clockGenCtrlGen = GCLK_CLKCTRL_GEN_GCLK0;
+            break;
+        case GCLK_1:
+            clockGenCtrlGen = GCLK_CLKCTRL_GEN_GCLK1;
+            break;
+        case GCLK_2:
+            clockGenCtrlGen = GCLK_CLKCTRL_GEN_GCLK2;
+            break;
+        case GCLK_3:
+            clockGenCtrlGen = GCLK_CLKCTRL_GEN_GCLK3;
+            break;
+        case GCLK_4:
+            clockGenCtrlGen = GCLK_CLKCTRL_GEN_GCLK4;
+            break;
+        case GCLK_5:
+        default:
+            clockGenCtrlGen = GCLK_CLKCTRL_GEN_GCLK5;
+            break;
+    };
+
+
+    GCLK->GENDIV.reg = GCLK_GENDIV_DIV(1) |
+                        GCLK_GENDIV_ID((int) gclk);
+    while (GCLK->STATUS.bit.SYNCBUSY);
+
+    GCLK->GENCTRL.reg = GCLK_GENCTRL_IDC |
+                        GCLK_GENCTRL_GENEN |
+                        GCLK_GENCTRL_SRC_DFLL48M |
+                        GCLK_GENCTRL_ID((int) gclk);
+    while (GCLK->STATUS.bit.SYNCBUSY);
+
+    GCLK->CLKCTRL.reg = GCLK_CLKCTRL_CLKEN |
+                        clockGenCtrlGen |
+                        clockGenCtrlId;
+    while (GCLK->STATUS.bit.SYNCBUSY);
+
+}
+
+
 template <class TimerRegisters> void Samd21TimerClass::setTimer(TimerNumberSamd21 timer, TimerRegisters TC, TimerParamsSamd21* params, uint8_t priority, GeneralClockSamd21 gclk){
     this->reset(TC);
 
@@ -102,8 +241,47 @@ template <class TimerRegisters> void Samd21TimerClass::setTimer(TimerNumberSamd2
 }
 
 
+template <class TimerRegisters> void Samd21TimerClass::reset(TimerRegisters TC){
+    TC->CTRLA.reg = TC_CTRLA_SWRST;
+    while (this->isSyncing(TC));
+    while (TC->CTRLA.bit.SWRST);
+}
 
 
+template <class TimerRegisters> bool Samd21TimerClass::isSyncing(TimerRegisters TC){
+    return TC->STATUS.bit.SYNCBUSY == 1;
+}
+
+
+void Samd21TimerClass::setNVIC(TimerNumberSamd21 timer, uint8_t priority){
+    IRQn_Type irqn;
+    switch(timer){
+        case TIMER_0:
+            irqn = TCC0_IRQn;
+            break;
+        case TIMER_1:
+            irqn = TCC1_IRQn;
+            break;
+        case TIMER_2:
+            irqn = TCC2_IRQn;
+            break;
+        case TIMER_3:
+            irqn = TC3_IRQn;
+            break;
+        case TIMER_4:
+            irqn = TC4_IRQn;
+            break;
+        case TIMER_5:
+        default:
+            irqn = TC5_IRQn;
+            break;
+    };
+
+    NVIC_DisableIRQ(irqn);
+    NVIC_ClearPendingIRQ(irqn);
+    NVIC_SetPriority(irqn, priority);
+    NVIC_EnableIRQ(irqn);
+}
 
 
 void TCC0_Handler(){

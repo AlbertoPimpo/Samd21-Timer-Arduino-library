@@ -64,7 +64,7 @@ class IChecker {
 
 
 #ifdef __SAMD21G18A__ 
-
+#define CPU_CLK 48000000
 
 typedef enum{
     TIMER_0 = 0,
@@ -143,11 +143,12 @@ class Samd21TimerClass : public ITimer<
         bool isCheckEnabled();
         bool isUnsafeModeEnabled();
         TimerParamsSamd21 getTimerParams(double freq, TimerResolutionSamd21 res);
-        template <class TimerRegisters> void setTimer(TimerNumberSamd21 timer, TimerRegisters TC, TimerParamsSamd21* params,  uint8_t priority, GeneralClockSamd21 gclk);
         void setGeneralClock(TimerNumberSamd21 timer, GeneralClockSamd21 gclk);
-        void setNVIC(TimerNumberSamd21 timer, uint8_t priority);
-        template <class TimerRegisters> bool isSyncing(TimerRegisters TC);
+        template <class TimerRegisters> void setTimer(TimerNumberSamd21 timer, TimerRegisters TC, TimerParamsSamd21* params,  uint8_t priority, GeneralClockSamd21 gclk);
         template <class TimerRegisters> void reset(TimerRegisters TC); 
+        template <class TimerRegisters> bool isSyncing(TimerRegisters TC);
+        void setNVIC(TimerNumberSamd21 timer, uint8_t priority);
+
 };
 
 
