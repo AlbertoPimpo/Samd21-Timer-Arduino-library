@@ -147,6 +147,7 @@ class Samd21TimerClass : public ITimer<
         void set_NVIC(TimerNumberSamd21 timer, uint8_t priority);
         template <class TimerRegisters> bool isSyncing(TimerRegisters TC);
         template <class TimerRegisters> void reset(TimerRegisters TC); 
+        template <class TimerRegisters> void set_timer_bit(TimerRegisters TC);       
 };
 
 
