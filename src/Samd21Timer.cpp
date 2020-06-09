@@ -2,7 +2,7 @@
 
 //Implementation of Samd21TimerClass Methods
 
-
+#ifdef __SAMD21G18A__
 void Samd21TimerClass::enable(TimerNumberSamd21 timer, double freq, void(*callback)(),  uint8_t priority, GeneralClockSamd21 gclk){
     if(freq >= 0.75)
         this->enable(timer, freq, callback, RESOLUTION_16_BIT, priority, gclk);
@@ -102,3 +102,116 @@ template <class TimerRegisters> void Samd21TimerClass::setTimer(TimerNumberSamd2
 }
 
 
+
+
+
+
+void TCC0_Handler(){
+    Timer.callbacks.timer_0_routine();
+    //enable interrupt again
+    switch(Timer.timerInfo.Timer0.res){
+        case RESOLUTION_32_BIT:
+            Timer.setTimerBit((TcCount32*) TCC0);
+            break;
+        case RESOLUTION_16_BIT:
+            Timer.setTimerBit((TcCount16*) TCC0);
+            break;
+        case RESOLUTION_8_BIT:
+        default:
+            Timer.setTimerBit((TcCount8*) TCC0);
+            break;
+    };
+}
+
+
+void TCC1_Handler(){
+    Timer.callbacks.timer_1_routine();
+    //enable interrupt again
+    switch(Timer.timerInfo.Timer1.res){
+        case RESOLUTION_32_BIT:
+            Timer.setTimerBit((TcCount32*) TCC1);
+            break;
+        case RESOLUTION_16_BIT:
+            Timer.setTimerBit((TcCount16*) TCC1);
+            break;
+        case RESOLUTION_8_BIT:
+        default:
+            Timer.setTimerBit((TcCount8*) TCC1);
+            break;
+    };
+}
+
+
+void TCC2_Handler(){
+    Timer.callbacks.timer_2_routine();
+    //enable interrupt again
+    switch(Timer.timerInfo.Timer2.res){
+        case RESOLUTION_32_BIT:
+            Timer.setTimerBit((TcCount32*) TCC2);
+            break;
+        case RESOLUTION_16_BIT:
+            Timer.setTimerBit((TcCount16*) TCC2);
+            break;
+        case RESOLUTION_8_BIT:
+        default:
+            Timer.setTimerBit((TcCount8*) TCC2);
+            break;
+    };
+}
+
+
+void TC3_Handler(){
+    Timer.callbacks.timer_3_routine();
+    //enable interrupt again
+    switch(Timer.timerInfo.Timer3.res){
+        case RESOLUTION_32_BIT:
+            Timer.setTimerBit((TcCount32*) TC3);
+            break;
+        case RESOLUTION_16_BIT:
+            Timer.setTimerBit((TcCount16*) TC3);
+            break;
+        case RESOLUTION_8_BIT:
+        default:
+            Timer.setTimerBit((TcCount8*) TC3);
+            break;
+    };
+}
+
+
+void TC4_Handler(){
+    Timer.callbacks.timer_4_routine();
+    //enable interrupt again
+    switch(Timer.timerInfo.Timer4.res){
+        case RESOLUTION_32_BIT:
+            Timer.setTimerBit((TcCount32*) TC4);
+            break;
+        case RESOLUTION_16_BIT:
+            Timer.setTimerBit((TcCount16*) TC4);
+            break;
+        case RESOLUTION_8_BIT:
+        default:
+            Timer.setTimerBit((TcCount8*) TC4);
+            break;
+    };
+}
+
+
+void TC5_Handler(){
+    Timer.callbacks.timer_5_routine();
+    //enable interrupt again
+    switch(Timer.timerInfo.Timer5.res){
+        case RESOLUTION_32_BIT:
+            Timer.setTimerBit((TcCount32*) TC5);
+            break;
+        case RESOLUTION_16_BIT:
+            Timer.setTimerBit((TcCount16*) TC5);
+            break;
+        case RESOLUTION_8_BIT:
+        default:
+            Timer.setTimerBit((TcCount8*) TC5);
+            break;
+    };
+}
+
+
+#endif
