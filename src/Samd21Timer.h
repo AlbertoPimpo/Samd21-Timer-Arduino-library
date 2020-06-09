@@ -38,9 +38,10 @@ class ITimer {
 }; 
 
 
-template <class TimerResolution, class TimerInfo>
+template <class TimerNumber, class TimerResolution, class TimerInfo>
 class IChecker {
     public:
+        virtual bool check_resolution(TimerNumber timer, double freq, TimerResolution res) = 0;
         virtual bool check_frequency(double freq, TimerResolution res) = 0;
         virtual bool check_compatibility(TimerInfo* timerinfo) = 0;
 };
@@ -146,8 +147,9 @@ class Samd21TimerClass : public ITimer<
 
 
 
-class CheckerSamd21 : public IChecker<TimerResolutionSamd21, TimerInfoSamd21> {
+class CheckerSamd21 : public IChecker<TimerNumberSamd21, TimerResolutionSamd21, TimerInfoSamd21> {
     public:
+        bool check_resolution(TimerNumberSamd21 timer, double freq, TimerResolutionSamd21 res);
         bool check_frequency(double freq, TimerResolutionSamd21 res);
         bool check_compatibility(TimerInfoSamd21* timerinfo);
 };
