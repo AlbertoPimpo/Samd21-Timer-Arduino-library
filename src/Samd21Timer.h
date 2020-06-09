@@ -142,11 +142,11 @@ class Samd21TimerClass : public ITimer<
         bool is_check_enabled();
         bool is_unsafe_mode_enabled();
         TimerParamsSamd21 get_timer_params(double freq, TimerResolutionSamd21 res);
-        template <class T> void set_timer(TimerNumberSamd21 timer, T timer_controller, TimerParamsSamd21* params, GeneralClockSamd21 gclk);
+        template <class TimerRegisters> void set_timer(TimerNumberSamd21 timer, TimerRegisters TC, TimerParamsSamd21* params,  uint8_t priority, GeneralClockSamd21 gclk);
         void set_general_clock(TimerNumberSamd21 timer, GeneralClockSamd21 gclk);
         void set_NVIC(TimerNumberSamd21 timer, uint8_t priority);
-        template <class T> bool isSyncing(T timer_controller);
-        template <class T> void reset(T timer_controller);        
+        template <class TimerRegisters> bool isSyncing(TimerRegisters TC);
+        template <class TimerRegisters> void reset(TimerRegisters TC); 
 };
 
 
