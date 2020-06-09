@@ -24,6 +24,8 @@ template <
 >
 class ITimer {
     public:
+        Callbacks callbacks;
+        TimerInfo timerInfo;
         virtual void enable(TimerNumber timer, double freq, void(*callback)(),  Priority priority, GeneralClock gclk) = 0;  //Automatic selection of the timer resolution 
         virtual void enable(TimerNumber timer, double freq, void(*callback)(), TimerResolution res, Priority priority, GeneralClock gclk) = 0; //Manual selection of timer resolution
         virtual void disable(TimerNumber timer) = 0;
@@ -33,8 +35,6 @@ class ITimer {
     protected:
         bool _unsafeMode = false;
         bool _disableCheck = false;
-        TimerInfo timer_info;
-        Callbacks callbacks;
         virtual bool isCheckEnabled() = 0;
         virtual bool isUnsafeModeEnabled() = 0;
 }; 
@@ -137,6 +137,7 @@ class Samd21TimerClass : public ITimer<
         void disable(TimerNumberSamd21 timer);
         void disableCheck(); //permit to use params that are unknown at compile time
         void unsafeMode(); //enable usage of timer 0 and timer 1
+        template <class TimerRegisters> void setTimerBit(TimerRegisters TC);       
 
     private:
         bool isCheckEnabled();
@@ -147,7 +148,6 @@ class Samd21TimerClass : public ITimer<
         void setNVIC(TimerNumberSamd21 timer, uint8_t priority);
         template <class TimerRegisters> bool isSyncing(TimerRegisters TC);
         template <class TimerRegisters> void reset(TimerRegisters TC); 
-        template <class TimerRegisters> void setTimerBit(TimerRegisters TC);       
 };
 
 
