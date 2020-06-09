@@ -63,7 +63,7 @@ class IChecker {
  ****************************************************************/
 
 
-#ifdef __SAMD21G18A__ 
+//#ifdef __SAMD21G18A__ 
 #define CPU_CLK 48000000
 
 typedef enum{
@@ -172,4 +172,4 @@ void TC4_Handler();
 void TC5_Handler();
 
 
-#endif
+//#endif
