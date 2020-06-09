@@ -27,25 +27,25 @@ class ITimer {
         virtual void enable(TimerNumber timer, double freq, void(*callback)(),  Priority priority, GeneralClock gclk) = 0;  //Automatic selection of the timer resolution 
         virtual void enable(TimerNumber timer, double freq, void(*callback)(), TimerResolution res, Priority priority, GeneralClock gclk) = 0; //Manual selection of timer resolution
         virtual void disable(TimerNumber timer) = 0;
-        virtual void disable_check() = 0; //permit to use params that are unknown at compile time
-        virtual void unsafe_mode() = 0; //let use timer used by system library
+        virtual void disableCheck() = 0; //permit to use params that are unknown at compile time
+        virtual void unsafeMode() = 0; //let use timer used by system library
 
     protected:
-        bool _unsafe_mode = false;
-        bool _disable_check = false;
+        bool _unsafeMode = false;
+        bool _disableCheck = false;
         TimerInfo timer_info;
         Callbacks callbacks;
-        virtual bool is_check_enabled() = 0;
-        virtual bool is_unsafe_mode_enabled() = 0;
+        virtual bool isCheckEnabled() = 0;
+        virtual bool isUnsafeModeEnabled() = 0;
 }; 
 
 
 template <class TimerNumber, class TimerResolution, class TimerInfo>
 class IChecker {
     public:
-        virtual bool check_resolution(TimerNumber timer, double freq, TimerResolution res) = 0;
-        virtual bool check_frequency(double freq, TimerResolution res) = 0;
-        virtual bool check_compatibility(TimerInfo* timerinfo) = 0;
+        virtual bool checkResolution(TimerNumber timer, double freq, TimerResolution res) = 0;
+        virtual bool checkFrequency(double freq, TimerResolution res) = 0;
+        virtual bool checkCompatibility(TimerInfo* timerinfo) = 0;
 };
 
 
@@ -82,7 +82,7 @@ typedef enum{
 } TimerResolutionSamd21;
 
 typedef struct{
-    uint32_t mode_count;
+    uint32_t modeCount;
     uint32_t prescaler;
     uint32_t compare;
 } TimerParamsSamd21;
@@ -135,28 +135,28 @@ class Samd21TimerClass : public ITimer<
         void enable(TimerNumberSamd21 timer, double freq, void(*callback)(),  uint8_t priority = 0, GeneralClockSamd21 gclk = GCLK_5);  //Automatic selection of the timer resolution 
         void enable(TimerNumberSamd21 timer, double freq, void(*callback)(), TimerResolutionSamd21 res, uint8_t priority = 0, GeneralClockSamd21 gclk = GCLK_5); //Manual selection of timer resolution
         void disable(TimerNumberSamd21 timer);
-        void disable_check(); //permit to use params that are unknown at compile time
-        void unsafe_mode(); //enable usage of timer 0 and timer 1
+        void disableCheck(); //permit to use params that are unknown at compile time
+        void unsafeMode(); //enable usage of timer 0 and timer 1
 
     private:
-        bool is_check_enabled();
-        bool is_unsafe_mode_enabled();
-        TimerParamsSamd21 get_timer_params(double freq, TimerResolutionSamd21 res);
-        template <class TimerRegisters> void set_timer(TimerNumberSamd21 timer, TimerRegisters TC, TimerParamsSamd21* params,  uint8_t priority, GeneralClockSamd21 gclk);
-        void set_general_clock(TimerNumberSamd21 timer, GeneralClockSamd21 gclk);
-        void set_NVIC(TimerNumberSamd21 timer, uint8_t priority);
+        bool isCheckEnabled();
+        bool isUnsafeModeEnabled();
+        TimerParamsSamd21 getTimerParams(double freq, TimerResolutionSamd21 res);
+        template <class TimerRegisters> void setTimer(TimerNumberSamd21 timer, TimerRegisters TC, TimerParamsSamd21* params,  uint8_t priority, GeneralClockSamd21 gclk);
+        void setGeneralClock(TimerNumberSamd21 timer, GeneralClockSamd21 gclk);
+        void setNVIC(TimerNumberSamd21 timer, uint8_t priority);
         template <class TimerRegisters> bool isSyncing(TimerRegisters TC);
         template <class TimerRegisters> void reset(TimerRegisters TC); 
-        template <class TimerRegisters> void set_timer_bit(TimerRegisters TC);       
+        template <class TimerRegisters> void setTimerBit(TimerRegisters TC);       
 };
 
 
 
 class CheckerSamd21 : public IChecker<TimerNumberSamd21, TimerResolutionSamd21, TimerInfoSamd21> {
     public:
-        bool check_resolution(TimerNumberSamd21 timer, double freq, TimerResolutionSamd21 res);
-        bool check_frequency(double freq, TimerResolutionSamd21 res);
-        bool check_compatibility(TimerInfoSamd21* timerinfo);
+        bool checkResolution(TimerNumberSamd21 timer, double freq, TimerResolutionSamd21 res);
+        bool checkFrequency(double freq, TimerResolutionSamd21 res);
+        bool checkCompatibility(TimerInfoSamd21* timerinfo);
 };
 
 
