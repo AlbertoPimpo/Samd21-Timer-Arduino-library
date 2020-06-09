@@ -35,6 +35,8 @@ class ITimer {
         bool _disable_check = false;
         TimerInfo timer_info;
         Callbacks callbacks;
+        virtual bool is_check_enabled() = 0;
+        virtual bool is_unsafe_mode_enabled() = 0;
 }; 
 
 
@@ -137,6 +139,8 @@ class Samd21TimerClass : public ITimer<
         void unsafe_mode(); //enable usage of timer 0 and timer 1
 
     private:
+        bool is_check_enabled();
+        bool is_unsafe_mode_enabled();
         TimerParamsSamd21 get_timer_params(double freq, TimerResolutionSamd21 res);
         template <class T> void set_timer(TimerNumberSamd21 timer, T timer_controller, TimerParamsSamd21* params, GeneralClockSamd21 gclk);
         void set_general_clock(TimerNumberSamd21 timer, GeneralClockSamd21 gclk);
