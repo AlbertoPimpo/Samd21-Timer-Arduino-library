@@ -283,6 +283,12 @@ void Samd21TimerClass::setNVIC(TimerNumberSamd21 timer, uint8_t priority){
 }
 
 
+template <class TimerRegisters> void Samd21TimerClass::setTimerBit(TimerRegisters TC){
+    TC->INTFLAG.bit.MC0 = 1;
+}
+
+
+
 void TCC0_Handler(){
     Timer.callbacks.timer_0_routine();
     //enable interrupt again
@@ -391,4 +397,7 @@ void TC5_Handler(){
 }
 
 
-#endif
+Samd21TimerClass Timer;
+
+
+#endif  /* __SAMD21G18A__ */
