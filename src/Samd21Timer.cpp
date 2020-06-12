@@ -4,7 +4,7 @@
 #ifdef __SAMD21G18A__
 
 
-void Samd21TimerClass::enable(TimerNumberSamd21 timer, double freq, void(*callback)(),  uint8_t priority, GeneralClockSamd21 gclk){
+void Samd21TimerClass::enable(TimerNumberSamd21 timer, float freq, void(*callback)(),  uint8_t priority, GeneralClockSamd21 gclk){
     if(freq >= 0.75)
         this->enable(timer, freq, callback, RESOLUTION_16_BIT, priority, gclk);
     else 
@@ -12,7 +12,7 @@ void Samd21TimerClass::enable(TimerNumberSamd21 timer, double freq, void(*callba
 }
 
 
-void Samd21TimerClass::enable(TimerNumberSamd21 timer, double freq, void(*callback)(), TimerResolutionSamd21 res, uint8_t priority, GeneralClockSamd21 gclk){
+void Samd21TimerClass::enable(TimerNumberSamd21 timer, float freq, void(*callback)(), TimerResolutionSamd21 res, uint8_t priority, GeneralClockSamd21 gclk){
     
     TimerParamsSamd21 params = this->getTimerParams(freq, res);
     setGeneralClock(timer, gclk);
@@ -81,7 +81,7 @@ void Samd21TimerClass::enable(TimerNumberSamd21 timer, double freq, void(*callba
 }
 
 
-TimerParamsSamd21 Samd21TimerClass::getTimerParams(double freq, TimerResolutionSamd21 res){
+TimerParamsSamd21 Samd21TimerClass::getTimerParams(float freq, TimerResolutionSamd21 res){
     TimerParamsSamd21 params;
     switch (res){
         case RESOLUTION_16_BIT:
@@ -201,13 +201,13 @@ void Samd21TimerClass::setGeneralClock(TimerNumberSamd21 timer, GeneralClockSamd
 
 
     GCLK->GENDIV.reg = GCLK_GENDIV_DIV(1) |
-                        GCLK_GENDIV_ID((int) gclk);
+                        GCLK_GENDIV_ID(gclk);
     while (GCLK->STATUS.bit.SYNCBUSY);
 
     GCLK->GENCTRL.reg = GCLK_GENCTRL_IDC |
                         GCLK_GENCTRL_GENEN |
                         GCLK_GENCTRL_SRC_DFLL48M |
-                        GCLK_GENCTRL_ID((int) gclk);
+                        GCLK_GENCTRL_ID(gclk);
     while (GCLK->STATUS.bit.SYNCBUSY);
 
     GCLK->CLKCTRL.reg = GCLK_CLKCTRL_CLKEN |

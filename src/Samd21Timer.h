@@ -1,5 +1,6 @@
 #include <Arduino.h>
-
+#ifndef _SAMD21_TIMER_
+#define _SAMD21_TIMER_
 // Used StaticAssert as a specialization of bool template instead of built-in one in order to grant 
 // back compatibility with old standards
 template <bool b>
@@ -25,8 +26,8 @@ class ITimer {
     public:
         Callbacks callbacks;
         TimerInfo timerInfo;
-        virtual void enable(TimerNumber timer, double freq, void(*callback)(),  Priority priority, GeneralClock gclk) = 0;  //Automatic selection of the timer resolution 
-        virtual void enable(TimerNumber timer, double freq, void(*callback)(), TimerResolution res, Priority priority, GeneralClock gclk) = 0; //Manual selection of timer resolution
+        virtual void enable(TimerNumber timer, float freq, void(*callback)(),  Priority priority, GeneralClock gclk) = 0;  //Automatic selection of the timer resolution 
+        virtual void enable(TimerNumber timer, float freq, void(*callback)(), TimerResolution res, Priority priority, GeneralClock gclk) = 0; //Manual selection of timer resolution
         //virtual void disable(TimerNumber timer) = 0;
         //virtual void disableCheck() = 0; //permit to use params that are unknown at compile time
         //virtual void unsafeMode() = 0; //let use timer used by system library
@@ -131,8 +132,8 @@ class Samd21TimerClass : public ITimer<
     GeneralClockSamd21, 
     uint8_t> {
     public:
-        void enable(TimerNumberSamd21 timer, double freq, void(*callback)(),  uint8_t priority = 0, GeneralClockSamd21 gclk = GCLK_5);  //Automatic selection of the timer resolution 
-        void enable(TimerNumberSamd21 timer, double freq, void(*callback)(), TimerResolutionSamd21 res, uint8_t priority = 0, GeneralClockSamd21 gclk = GCLK_5); //Manual selection of timer resolution
+        void enable(TimerNumberSamd21 timer, float freq, void(*callback)(),  uint8_t priority = 0, GeneralClockSamd21 gclk = GCLK_5);  //Automatic selection of the timer resolution 
+        void enable(TimerNumberSamd21 timer, float freq, void(*callback)(), TimerResolutionSamd21 res, uint8_t priority = 0, GeneralClockSamd21 gclk = GCLK_5); //Manual selection of timer resolution
         void disable(TimerNumberSamd21 timer);
         void disableCheck(); //permit to use params that are unknown at compile time
         void unsafeMode(); //enable usage of timer 0 and timer 1
@@ -141,7 +142,7 @@ class Samd21TimerClass : public ITimer<
     private:
         bool isCheckEnabled();
         bool isUnsafeModeEnabled();
-        TimerParamsSamd21 getTimerParams(double freq, TimerResolutionSamd21 res);
+        TimerParamsSamd21 getTimerParams(float freq, TimerResolutionSamd21 res);
         void setGeneralClock(TimerNumberSamd21 timer, GeneralClockSamd21 gclk);
         template <class TimerRegisters> void setTimer(TimerNumberSamd21 timer, TimerRegisters TC, TimerParamsSamd21* params,  uint8_t priority, GeneralClockSamd21 gclk);
         template <class TimerRegisters> void reset(TimerRegisters TC); 
@@ -171,4 +172,8 @@ void TC4_Handler();
 void TC5_Handler();
 
 
-#endif
+#endif  //__SAMD21G18A__
+
+
+
+#endif  //_SAMD21_TIMER_
