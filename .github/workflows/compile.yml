@@ -33,7 +33,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest]
-        example: [examples]
+        example: [examples/empty_sketch.ino, examples/serial_timer.ino]
 
     steps:
   
@@ -45,4 +45,5 @@ jobs:
       run: |
         arduino-cli core update-index
         arduino-cli board listall zero
+        echo "compiling ${{ matrix.example }}..."
         arduino-cli compile -b arduino:samd:zero ${{ matrix.example }}
