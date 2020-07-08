@@ -26,7 +26,7 @@ class ITimer {
     public:
         virtual void enable(TimerNumber timer, float freq, void(*callback)(),  Priority priority, GeneralClock gclk) = 0;  //Automatic selection of the timer resolution 
         virtual void enable(TimerNumber timer, float freq, void(*callback)(), TimerResolution res, Priority priority, GeneralClock gclk) = 0; //Manual selection of timer resolution
-        //virtual void disable(TimerNumber timer) = 0;
+        virtual void disable(TimerNumber timer) = 0;
         //virtual void disableCheck() = 0; //permit to use params that are unknown at compile time
         //virtual void unsafeMode() = 0; //let use timer used by system library
 
@@ -130,6 +130,7 @@ class Samd21TimerClass : public ITimer<
         static const int timerAmount = 6;
         TimerFlagsSamd21 timerFlags[timerAmount];
         CallbacksSamd21 callbacks;
+        Tc* timerLookUp[timerAmount] = {(Tc*) TCC0, (Tc*) TCC1, (Tc*) TCC2, TC3, TC4, TC5};
         void enable(TimerNumberSamd21 timer, float freq, void(*callback)(),  uint8_t priority = 0, GeneralClockSamd21 gclk = GCLK_5);  //Automatic selection of the timer resolution 
         void enable(TimerNumberSamd21 timer, float freq, void(*callback)(), TimerResolutionSamd21 res, uint8_t priority = 0, GeneralClockSamd21 gclk = GCLK_5); //Manual selection of timer resolution
         void disable(TimerNumberSamd21 timer);

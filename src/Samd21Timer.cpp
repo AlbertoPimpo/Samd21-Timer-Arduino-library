@@ -17,6 +17,7 @@ void Samd21TimerClass::enable(TimerNumberSamd21 timer, float freq, void(*callbac
     this->setCallback(timer, callback);
     setGeneralClock(timer, gclk);
     TimerParamsSamd21 params = this->getTimerParams(freq, res);
+
     //refactor to selection in array
     if (res == RESOLUTION_32_BIT){
         TcCount32* TC;
@@ -320,6 +321,12 @@ void Samd21TimerClass::setCallback(TimerNumberSamd21 timer, void(*callback)()){
             break;
         
     }
+}
+
+void Samd21TimerClass::disable(TimerNumberSamd21 timer){
+    TcCount16* TC = (TcCount16*) this->timerLookUp[timer]; //casted to 32 bit because it's the same for each resolution
+    TC->CTRLA.reg &= ~TC_CTRLA_ENABLE;
+    while (this->isSyncing(TC));
 }
 
 
