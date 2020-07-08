@@ -10,6 +10,6 @@ void setup() {
 }
 
 void loop() {
-  Timer.enable(TIMER_5, 1.0, &callback);
-  //Timer.disable(TIMER_5);
+  Timer.enable(TIMER_5, 1.0, callback);
+  Timer.disable(TIMER_5);
 }
