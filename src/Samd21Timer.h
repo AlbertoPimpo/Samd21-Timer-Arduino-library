@@ -17,15 +17,13 @@ template <
     class TimerNumber,
     class TimerResolution,
     class TimerParams,
-    class TimerInfo,
+    class TimerFlags,
     class Callbacks,
     class GeneralClock,
     class Priority
 >
 class ITimer {
     public:
-        Callbacks callbacks;
-        TimerInfo timerInfo;
         virtual void enable(TimerNumber timer, float freq, void(*callback)(),  Priority priority, GeneralClock gclk) = 0;  //Automatic selection of the timer resolution 
         virtual void enable(TimerNumber timer, float freq, void(*callback)(), TimerResolution res, Priority priority, GeneralClock gclk) = 0; //Manual selection of timer resolution
         //virtual void disable(TimerNumber timer) = 0;
@@ -40,12 +38,14 @@ class ITimer {
 }; 
 
 
-template <class TimerNumber, class TimerResolution, class TimerInfo>
+
+//refactor change timerinfo to timer flags array
+template <class TimerNumber, class TimerResolution, class TimerFlags>
 class IChecker {
     public:
         virtual bool checkResolution(TimerNumber timer, double freq, TimerResolution res) = 0;
         virtual bool checkFrequency(double freq, TimerResolution res) = 0;
-        virtual bool checkCompatibility(TimerInfo* timerinfo) = 0;
+        virtual bool checkCompatibility(TimerFlags timerFlags[]) = 0;
 };
 
 
@@ -64,6 +64,7 @@ class IChecker {
 
 
 #ifdef __SAMD21G18A__ 
+//refactor, change this macro with the built-in one
 #define SAMD21_CLK 48000000
 
 typedef enum{
@@ -91,17 +92,8 @@ typedef struct{
 typedef struct{
     bool isActive = false;
     TimerResolutionSamd21 res; 
-} TimerFlagSamd21;
+} TimerFlagsSamd21;
 
-
-typedef struct{
-    TimerFlagSamd21 Timer0;
-    TimerFlagSamd21 Timer1;
-    TimerFlagSamd21 Timer2;
-    TimerFlagSamd21 Timer3;
-    TimerFlagSamd21 Timer4;
-    TimerFlagSamd21 Timer5;
-} TimerInfoSamd21;
 
 typedef struct{
     void (*timer_0_routine)();
@@ -123,31 +115,38 @@ typedef enum{
 
 
 
+
+//refactor check unused template class
+
 class Samd21TimerClass : public ITimer<
     TimerNumberSamd21, 
     TimerResolutionSamd21, 
     TimerParamsSamd21, 
-    TimerInfoSamd21, 
+    TimerFlagsSamd21, 
     CallbacksSamd21, 
     GeneralClockSamd21, 
     uint8_t> {
     public:
+        static const int timerAmount = 6;
+        TimerFlagsSamd21 timerFlags[timerAmount];
+        CallbacksSamd21 callbacks;
         void enable(TimerNumberSamd21 timer, float freq, void(*callback)(),  uint8_t priority = 0, GeneralClockSamd21 gclk = GCLK_5);  //Automatic selection of the timer resolution 
         void enable(TimerNumberSamd21 timer, float freq, void(*callback)(), TimerResolutionSamd21 res, uint8_t priority = 0, GeneralClockSamd21 gclk = GCLK_5); //Manual selection of timer resolution
         void disable(TimerNumberSamd21 timer);
         void disableCheck(); //permit to use params that are unknown at compile time
         void unsafeMode(); //enable usage of timer 0 and timer 1
-        template <class TimerRegisters> void setTimerBit(TimerRegisters TC);       
+        template <class TimerRegisters> void setTimerBit(TimerRegisters TC);     
 
     private:
         bool isCheckEnabled();
         bool isUnsafeModeEnabled();
         TimerParamsSamd21 getTimerParams(float freq, TimerResolutionSamd21 res);
         void setGeneralClock(TimerNumberSamd21 timer, GeneralClockSamd21 gclk);
-        template <class TimerRegisters> void setTimer(TimerNumberSamd21 timer, TimerRegisters TC, TimerParamsSamd21* params,  uint8_t priority, GeneralClockSamd21 gclk);
+        template <class TimerRegisters> void setTimerRegisters(TimerNumberSamd21 timer, TimerRegisters TC, TimerParamsSamd21* params,  uint8_t priority, GeneralClockSamd21 gclk);
         template <class TimerRegisters> void reset(TimerRegisters TC); 
         template <class TimerRegisters> bool isSyncing(TimerRegisters TC);
         void setNVIC(TimerNumberSamd21 timer, uint8_t priority);
+        void setCallback(TimerNumberSamd21 timer, void(*callback)());
 
 };
 
@@ -161,15 +160,20 @@ class Samd21TimerClass : public ITimer<
 // };
 
 
+
+
+
+extern void TCC0_Handler();
+extern void TCC1_Handler();
+extern void TCC2_Handler();
+extern void TC3_Handler();
+extern void TC4_Handler();
+extern void TC5_Handler();
+
+
+
 extern Samd21TimerClass Timer;
 
-
-void TCC0_Handler();
-void TCC1_Handler();
-void TCC2_Handler();
-void TC3_Handler();
-void TC4_Handler();
-void TC5_Handler();
 
 
 #endif  //__SAMD21G18A__

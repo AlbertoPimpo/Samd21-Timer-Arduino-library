@@ -13,10 +13,11 @@ void Samd21TimerClass::enable(TimerNumberSamd21 timer, float freq, void(*callbac
 
 
 void Samd21TimerClass::enable(TimerNumberSamd21 timer, float freq, void(*callback)(), TimerResolutionSamd21 res, uint8_t priority, GeneralClockSamd21 gclk){
-    
-    TimerParamsSamd21 params = this->getTimerParams(freq, res);
+    this->timerFlags[timer].res = res; 
+    this->setCallback(timer, callback);
     setGeneralClock(timer, gclk);
-
+    TimerParamsSamd21 params = this->getTimerParams(freq, res);
+    //refactor to selection in array
     if (res == RESOLUTION_32_BIT){
         TcCount32* TC;
 
@@ -41,7 +42,7 @@ void Samd21TimerClass::enable(TimerNumberSamd21 timer, float freq, void(*callbac
                 break;
         };
         
-        this->setTimer(timer, TC, &params, priority, gclk);
+        this->setTimerRegisters(timer, TC, &params, priority, gclk);
 
     }
 
@@ -69,7 +70,7 @@ void Samd21TimerClass::enable(TimerNumberSamd21 timer, float freq, void(*callbac
                 break;
         };
 
-        this->setTimer(timer, TC, &params, priority, gclk);
+        this->setTimerRegisters(timer, TC, &params, priority, gclk);
     
     }
 
@@ -78,6 +79,7 @@ void Samd21TimerClass::enable(TimerNumberSamd21 timer, float freq, void(*callbac
 
     }
 
+    this->timerFlags[timer].isActive = true;
 }
 
 
@@ -218,12 +220,15 @@ void Samd21TimerClass::setGeneralClock(TimerNumberSamd21 timer, GeneralClockSamd
 }
 
 
-template <class TimerRegisters> void Samd21TimerClass::setTimer(TimerNumberSamd21 timer, TimerRegisters TC, TimerParamsSamd21* params, uint8_t priority, GeneralClockSamd21 gclk){
+template <class TimerRegisters> void Samd21TimerClass::setTimerRegisters(TimerNumberSamd21 timer, TimerRegisters TC, TimerParamsSamd21* params, uint8_t priority, GeneralClockSamd21 gclk){
     this->reset(TC);
 
     TC->CTRLA.reg |= params->modeCount;
     TC->CTRLA.reg |= TC_CTRLA_WAVEGEN_MFRQ;
     TC->CTRLA.reg |= params->prescaler;
+    //TC->CTRLA.reg |= TC_CTRLA_ENABLE;
+
+
 
     TC->CC[0].reg = params->compare;
     
@@ -253,6 +258,7 @@ template <class TimerRegisters> bool Samd21TimerClass::isSyncing(TimerRegisters 
 
 
 void Samd21TimerClass::setNVIC(TimerNumberSamd21 timer, uint8_t priority){
+    //refactor as array
     IRQn_Type irqn;
     switch(timer){
         case TIMER_0:
@@ -289,10 +295,42 @@ template <class TimerRegisters> void Samd21TimerClass::setTimerBit(TimerRegister
 
 
 
+void Samd21TimerClass::setCallback(TimerNumberSamd21 timer, void(*callback)()){
+
+    //refactor as array of callbacks
+    switch (timer) {
+        case TIMER_0:
+            this->callbacks.timer_0_routine = callback;
+            break;
+        case TIMER_1:
+            this->callbacks.timer_1_routine = callback;
+            break;
+        case TIMER_2:
+            this->callbacks.timer_2_routine = callback;
+            break;
+        case TIMER_3:
+            this->callbacks.timer_3_routine = callback;
+            break;
+        case TIMER_4:
+            this->callbacks.timer_4_routine = callback;
+            break;
+        case TIMER_5:
+        default:
+            this->callbacks.timer_5_routine = callback; 
+            break;
+        
+    }
+}
+
+
+
+//refactor, define if timer exist
+//refactor, define a parametric handler what will be called by each handler
+
 void TCC0_Handler(){
     Timer.callbacks.timer_0_routine();
     //enable interrupt again
-    switch(Timer.timerInfo.Timer0.res){
+    switch(Timer.timerFlags[TIMER_0].res){
         case RESOLUTION_32_BIT:
             Timer.setTimerBit((TcCount32*) TCC0);
             break;
@@ -310,7 +348,7 @@ void TCC0_Handler(){
 void TCC1_Handler(){
     Timer.callbacks.timer_1_routine();
     //enable interrupt again
-    switch(Timer.timerInfo.Timer1.res){
+    switch(Timer.timerFlags[TIMER_1].res){
         case RESOLUTION_32_BIT:
             Timer.setTimerBit((TcCount32*) TCC1);
             break;
@@ -328,7 +366,7 @@ void TCC1_Handler(){
 void TCC2_Handler(){
     Timer.callbacks.timer_2_routine();
     //enable interrupt again
-    switch(Timer.timerInfo.Timer2.res){
+    switch(Timer.timerFlags[TIMER_2].res){
         case RESOLUTION_32_BIT:
             Timer.setTimerBit((TcCount32*) TCC2);
             break;
@@ -346,7 +384,7 @@ void TCC2_Handler(){
 void TC3_Handler(){
     Timer.callbacks.timer_3_routine();
     //enable interrupt again
-    switch(Timer.timerInfo.Timer3.res){
+    switch(Timer.timerFlags[TIMER_3].res){
         case RESOLUTION_32_BIT:
             Timer.setTimerBit((TcCount32*) TC3);
             break;
@@ -364,7 +402,7 @@ void TC3_Handler(){
 void TC4_Handler(){
     Timer.callbacks.timer_4_routine();
     //enable interrupt again
-    switch(Timer.timerInfo.Timer4.res){
+    switch(Timer.timerFlags[TIMER_4].res){
         case RESOLUTION_32_BIT:
             Timer.setTimerBit((TcCount32*) TC4);
             break;
@@ -382,7 +420,7 @@ void TC4_Handler(){
 void TC5_Handler(){
     Timer.callbacks.timer_5_routine();
     //enable interrupt again
-    switch(Timer.timerInfo.Timer5.res){
+    switch(Timer.timerFlags[TIMER_5].res){
         case RESOLUTION_32_BIT:
             Timer.setTimerBit((TcCount32*) TC5);
             break;
@@ -395,7 +433,6 @@ void TC5_Handler(){
             break;
     };
 }
-
 
 Samd21TimerClass Timer;
 
