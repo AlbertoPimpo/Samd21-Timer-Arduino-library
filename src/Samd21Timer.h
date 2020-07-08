@@ -28,11 +28,7 @@ class ITimer {
         virtual void enable(TimerNumber timer, float freq, void(*callback)(), TimerResolution res, Priority priority, GeneralClock gclk) = 0; //Manual selection of timer resolution
         virtual void disable(TimerNumber timer) = 0;
         //virtual void disableCheck() = 0; //permit to use params that are unknown at compile time
-        //virtual void unsafeMode() = 0; //let use timer used by system library
-
     protected:
-        bool _unsafeMode = false;
-        bool _disableCheck = false;
         //virtual bool isCheckEnabled() = 0;
         //virtual bool isUnsafeModeEnabled() = 0;
 }; 
@@ -135,10 +131,11 @@ class Samd21TimerClass : public ITimer<
         void enable(TimerNumberSamd21 timer, float freq, void(*callback)(), TimerResolutionSamd21 res, uint8_t priority = 0, GeneralClockSamd21 gclk = GCLK_5); //Manual selection of timer resolution
         void disable(TimerNumberSamd21 timer);
         void disableCheck(); //permit to use params that are unknown at compile time
-        void unsafeMode(); //enable usage of timer 0 and timer 1
         template <class TimerRegisters> void setTimerBit(TimerRegisters TC);     
 
     private:
+        bool _unsafeMode = false;
+        bool _disableCheck = false;
         bool isCheckEnabled();
         bool isUnsafeModeEnabled();
         TimerParamsSamd21 getTimerParams(float freq, TimerResolutionSamd21 res);
