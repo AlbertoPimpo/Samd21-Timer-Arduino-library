@@ -13,9 +13,26 @@ void Samd21TimerClass::enable(TimerNumberSamd21 timer, float freq, void(*callbac
 
 
 void Samd21TimerClass::enable(TimerNumberSamd21 timer, float freq, void(*callback)(), TimerResolutionSamd21 res, uint8_t priority, GeneralClockSamd21 gclk){
+
     this->timerFlags[timer].res = res; 
+    this->timerFlags[timer].isActive = true;
+
+    // static const bool resolution = checker.checkResolution(timer, res);
+    // static const bool frequency = checker.checkFrequency(freq, res);
+    // static const bool compatibility = checker.checkCompatibility(this->timerFlags);
+
+
+    // if(this->isCheckEnabled()){
+    //     static_assert(resolution, "this timer doesn't support 32 bit resolution");
+    //     static_assert(frequency, "this timer doesn't support this frequency");
+    //     static_assert(compatibility, "cannot use a 32 bit timer and the following one");
+    // }
+
+
+
     this->setCallback(timer, callback);
-    setGeneralClock(timer, gclk);
+
+    this->setGeneralClock(timer, gclk);
     TimerParamsSamd21 params = this->getTimerParams(freq, res);
 
     //refactor to selection in array
@@ -23,15 +40,6 @@ void Samd21TimerClass::enable(TimerNumberSamd21 timer, float freq, void(*callbac
         TcCount32* TC;
 
         switch (timer){
-            case TIMER_0:
-                TC = (TcCount32*) TCC0;
-                break;
-            case TIMER_1:
-                TC = (TcCount32*) TCC1;
-                break;
-            case TIMER_2:
-                TC = (TcCount32*) TCC2;
-                break;
             case TIMER_3:
                 TC = (TcCount32*) TC3;
                 break;
@@ -51,15 +59,6 @@ void Samd21TimerClass::enable(TimerNumberSamd21 timer, float freq, void(*callbac
         TcCount16* TC;
 
         switch (timer){
-            case TIMER_0:
-                TC = (TcCount16*) TCC0;
-                break;
-            case TIMER_1:
-                TC = (TcCount16*) TCC1;
-                break;
-            case TIMER_2:
-                TC = (TcCount16*) TCC2;
-                break;
             case TIMER_3:
                 TC = (TcCount16*) TC3;
                 break;
@@ -74,13 +73,6 @@ void Samd21TimerClass::enable(TimerNumberSamd21 timer, float freq, void(*callbac
         this->setTimerRegisters(timer, TC, &params, priority, gclk);
     
     }
-
-    else if (res == RESOLUTION_8_BIT){
-        //TO DO 
-
-    }
-
-    this->timerFlags[timer].isActive = true;
 }
 
 
@@ -119,7 +111,8 @@ TimerParamsSamd21 Samd21TimerClass::getTimerParams(float freq, TimerResolutionSa
             break;
         
         case RESOLUTION_32_BIT:
-            params.modeCount = TC_CTRLA_MODE_COUNT16;
+        default:
+            params.modeCount = TC_CTRLA_MODE_COUNT32;
 
             if (freq > 0.02) {
                 params.prescaler = TC_CTRLA_PRESCALER_DIV1;
@@ -148,28 +141,19 @@ TimerParamsSamd21 Samd21TimerClass::getTimerParams(float freq, TimerResolutionSa
             } 
 
             break;
-
-        case RESOLUTION_8_BIT:
-        default:
-            //TO DO
-            break;
-        
     };
 
     return params;
 }
 
 
+
 void Samd21TimerClass::setGeneralClock(TimerNumberSamd21 timer, GeneralClockSamd21 gclk){  
     unsigned long clockGenCtrlId;
     unsigned long clockGenCtrlGen;
     
+
     switch (timer){
-        case TIMER_0:
-        case TIMER_1:
-            clockGenCtrlId = GCLK_CLKCTRL_ID_TCC0_TCC1;
-            break;
-        case TIMER_2:
         case TIMER_3:
             clockGenCtrlId = GCLK_CLKCTRL_ID_TCC2_TC3;
             break;
@@ -180,6 +164,7 @@ void Samd21TimerClass::setGeneralClock(TimerNumberSamd21 timer, GeneralClockSamd
             break;
     };
 
+    //refactor as array
     switch(gclk){
         case GCLK_0:
             clockGenCtrlGen = GCLK_CLKCTRL_GEN_GCLK0;
@@ -262,15 +247,6 @@ void Samd21TimerClass::setNVIC(TimerNumberSamd21 timer, uint8_t priority){
     //refactor as array
     IRQn_Type irqn;
     switch(timer){
-        case TIMER_0:
-            irqn = TCC0_IRQn;
-            break;
-        case TIMER_1:
-            irqn = TCC1_IRQn;
-            break;
-        case TIMER_2:
-            irqn = TCC2_IRQn;
-            break;
         case TIMER_3:
             irqn = TC3_IRQn;
             break;
@@ -300,15 +276,6 @@ void Samd21TimerClass::setCallback(TimerNumberSamd21 timer, void(*callback)()){
 
     //refactor as array of callbacks
     switch (timer) {
-        case TIMER_0:
-            this->callbacks.timer_0_routine = callback;
-            break;
-        case TIMER_1:
-            this->callbacks.timer_1_routine = callback;
-            break;
-        case TIMER_2:
-            this->callbacks.timer_2_routine = callback;
-            break;
         case TIMER_3:
             this->callbacks.timer_3_routine = callback;
             break;
@@ -331,61 +298,48 @@ void Samd21TimerClass::disable(TimerNumberSamd21 timer){
 
 
 
+
+void Samd21TimerClass::disableCheck(){
+    this->_disableCheck = true;
+}
+
+
+bool Samd21TimerClass::isCheckEnabled(){
+    return !(this->_disableCheck);
+}
+
+
+
+
+
+bool CheckerSamd21::checkResolution(TimerNumberSamd21 timer, TimerResolutionSamd21 res){
+    if(res == RESOLUTION_32_BIT && timer == TIMER_3)
+        return false;
+    else
+        return true;
+}
+
+bool CheckerSamd21::checkFrequency(double freq, TimerResolutionSamd21 res){
+    if(res == RESOLUTION_16_BIT && freq < 0.75 )
+        return false;
+    if(res == RESOLUTION_32_BIT && freq < 0.000011)
+        return false;
+    return true;
+}
+
+bool CheckerSamd21::checkCompatibility(TimerFlagsSamd21 timerinfo[]){
+    if(timerinfo[TIMER_4].res == RESOLUTION_32_BIT && timerinfo[TIMER_5].isActive == true && timerinfo[TIMER_4].isActive == true)
+        return false;
+    return true;
+}
+
+
+
+
 //refactor, define if timer exist
 //refactor, define a parametric handler what will be called by each handler
 
-void TCC0_Handler(){
-    Timer.callbacks.timer_0_routine();
-    //enable interrupt again
-    switch(Timer.timerFlags[TIMER_0].res){
-        case RESOLUTION_32_BIT:
-            Timer.setTimerBit((TcCount32*) TCC0);
-            break;
-        case RESOLUTION_16_BIT:
-            Timer.setTimerBit((TcCount16*) TCC0);
-            break;
-        case RESOLUTION_8_BIT:
-        default:
-            Timer.setTimerBit((TcCount8*) TCC0);
-            break;
-    };
-}
 
-
-void TCC1_Handler(){
-    Timer.callbacks.timer_1_routine();
-    //enable interrupt again
-    switch(Timer.timerFlags[TIMER_1].res){
-        case RESOLUTION_32_BIT:
-            Timer.setTimerBit((TcCount32*) TCC1);
-            break;
-        case RESOLUTION_16_BIT:
-            Timer.setTimerBit((TcCount16*) TCC1);
-            break;
-        case RESOLUTION_8_BIT:
-        default:
-            Timer.setTimerBit((TcCount8*) TCC1);
-            break;
-    };
-}
-
-
-void TCC2_Handler(){
-    Timer.callbacks.timer_2_routine();
-    //enable interrupt again
-    switch(Timer.timerFlags[TIMER_2].res){
-        case RESOLUTION_32_BIT:
-            Timer.setTimerBit((TcCount32*) TCC2);
-            break;
-        case RESOLUTION_16_BIT:
-            Timer.setTimerBit((TcCount16*) TCC2);
-            break;
-        case RESOLUTION_8_BIT:
-        default:
-            Timer.setTimerBit((TcCount8*) TCC2);
-            break;
-    };
-}
 
 
 void TC3_Handler(){
@@ -396,11 +350,8 @@ void TC3_Handler(){
             Timer.setTimerBit((TcCount32*) TC3);
             break;
         case RESOLUTION_16_BIT:
-            Timer.setTimerBit((TcCount16*) TC3);
-            break;
-        case RESOLUTION_8_BIT:
         default:
-            Timer.setTimerBit((TcCount8*) TC3);
+            Timer.setTimerBit((TcCount16*) TC3);
             break;
     };
 }
@@ -414,11 +365,8 @@ void TC4_Handler(){
             Timer.setTimerBit((TcCount32*) TC4);
             break;
         case RESOLUTION_16_BIT:
-            Timer.setTimerBit((TcCount16*) TC4);
-            break;
-        case RESOLUTION_8_BIT:
         default:
-            Timer.setTimerBit((TcCount8*) TC4);
+            Timer.setTimerBit((TcCount16*) TC4);
             break;
     };
 }
@@ -432,11 +380,8 @@ void TC5_Handler(){
             Timer.setTimerBit((TcCount32*) TC5);
             break;
         case RESOLUTION_16_BIT:
-            Timer.setTimerBit((TcCount16*) TC5);
-            break;
-        case RESOLUTION_8_BIT:
         default:
-            Timer.setTimerBit((TcCount8*) TC5);
+            Timer.setTimerBit((TcCount16*) TC5);
             break;
     };
 }
