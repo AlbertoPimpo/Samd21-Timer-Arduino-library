@@ -8,7 +8,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest]
-        example: [examples]
+        example: [examples/empty_sketch.ino, examples/serial_blink.ino, examples/serial_timer.ino]
 
     steps:
     - uses: actions/checkout@v1
