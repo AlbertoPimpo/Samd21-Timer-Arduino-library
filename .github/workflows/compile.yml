@@ -7,7 +7,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest]
+        os: [ubuntu-latest, windows-latest, macos-latest]
         example: [examples/empty_sketch.ino, examples/serial_blink.ino, examples/serial_timer.ino]
 
     steps:
@@ -33,7 +33,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest]
-        example: [examples/empty_sketch.ino, examples/serial_timer.ino]
+        example: [examples/empty_sketch.ino, examples/serial_blink.ino, examples/serial_timer.ino]
 
     steps:
   
