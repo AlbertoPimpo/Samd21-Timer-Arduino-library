@@ -28,23 +28,23 @@ jobs:
       env:
         PLATFORMIO_CI_SRC: ${{ matrix.example }}
 
-  build-arduino:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-latest, windows-latest]
-        example: [examples]
+  # build-arduino:
+  #   runs-on: ${{ matrix.os }}
+  #   strategy:
+  #     matrix:
+  #       os: [ubuntu-latest, windows-latest]
+  #       example: [examples]
 
-    steps:
+  #   steps:
   
-    - name: Setup Arduino CLI
-      uses: arduino/setup-arduino-cli@v1.0.0
+  #   - name: Setup Arduino CLI
+  #     uses: arduino/setup-arduino-cli@v1.0.0
        
 
-    - name: Run Arduino CLI
-      run: |
-        arduino-cli core update-index
-        arduino-cli core install arduino:samd
-        arduino-cli board listall arduino_zero_native
-        echo "compiling ${{ matrix.example }}..."
-        arduino-cli compile --fqbn arduino:samd:arduino_zero_native ${{ matrix.example }}
+  #   - name: Run Arduino CLI
+  #     run: |
+  #       arduino-cli core update-index
+  #       arduino-cli core install arduino:samd
+  #       arduino-cli board listall arduino_zero_native
+  #       echo "compiling ${{ matrix.example }}..."
+  #       arduino-cli compile --fqbn arduino:samd:arduino_zero_native ${{ matrix.example }}
