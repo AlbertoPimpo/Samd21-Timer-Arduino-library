@@ -33,7 +33,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest]
-        example: [empty_sketch.ino, serial_blink.ino, serial_timer.ino]
+        example: [examples]
 
     steps:
   
