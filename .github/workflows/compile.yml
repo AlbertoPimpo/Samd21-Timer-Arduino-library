@@ -45,6 +45,6 @@ jobs:
       run: |
         arduino-cli core update-index
         arduino-cli core install arduino:samd
-        arduino-cli board listall
+        arduino-cli board listall arduino_zero_native
         echo "compiling ${{ matrix.example }}..."
-        arduino-cli compile -b arduino:samd:zero ${{ matrix.example }}
+        arduino-cli compile -b arduino:samd:arduino_zero_native ${{ matrix.example }}
