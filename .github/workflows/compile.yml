@@ -44,6 +44,7 @@ jobs:
     - name: Run Arduino CLI
       run: |
         arduino-cli core update-index
-        arduino-cli board listall zero
+        arduino-cli core install arduino:samd
+        arduino-cli board listall
         echo "compiling ${{ matrix.example }}..."
         arduino-cli compile -b arduino:samd:zero ${{ matrix.example }}
