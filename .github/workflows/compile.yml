@@ -33,7 +33,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest]
-        example: [examples/empty_sketch.ino, examples/serial_blink.ino, examples/serial_timer.ino]
+        example: [empty_sketch.ino, serial_blink.ino, serial_timer.ino]
 
     steps:
   
@@ -47,4 +47,4 @@ jobs:
         arduino-cli core install arduino:samd
         arduino-cli board listall arduino_zero_native
         echo "compiling ${{ matrix.example }}..."
-        arduino-cli compile -b arduino:samd:arduino_zero_native ${{ matrix.example }}
+        arduino-cli compile --fqbn arduino:samd:arduino_zero_native ${{ matrix.example }}
