@@ -1,5 +1,13 @@
 #include "Samd21Timer.h"
-//Implementation of Samd21TimerClass Methods
+
+
+
+/****************************************************************
+ ****************************************************************
+ ****************     SAMD21 implementation    ******************
+ ****************************************************************
+ ****************************************************************/
+
 
 #ifdef __SAMD21G18A__
 
@@ -17,17 +25,6 @@ void Samd21TimerClass::enable(TimerNumberSamd21 timer, float freq, void(*callbac
     this->timerFlags[timer].res = res; 
     this->timerFlags[timer].isActive = true;
 
-    // static const bool resolution = checker.checkResolution(timer, res);
-    // static const bool frequency = checker.checkFrequency(freq, res);
-    // static const bool compatibility = checker.checkCompatibility(this->timerFlags);
-
-
-    // if(this->isCheckEnabled()){
-    //     static_assert(resolution, "this timer doesn't support 32 bit resolution");
-    //     static_assert(frequency, "this timer doesn't support this frequency");
-    //     static_assert(compatibility, "cannot use a 32 bit timer and the following one");
-    // }
-
 
 
     this->setCallback(timer, callback);
@@ -35,7 +32,6 @@ void Samd21TimerClass::enable(TimerNumberSamd21 timer, float freq, void(*callbac
     this->setGeneralClock(timer, gclk);
     TimerParamsSamd21 params = this->getTimerParams(freq, res);
 
-    //refactor to selection in array
     if (res == RESOLUTION_32_BIT){
         TcCount32* TC;
 
@@ -164,7 +160,6 @@ void Samd21TimerClass::setGeneralClock(TimerNumberSamd21 timer, GeneralClockSamd
             break;
     };
 
-    //refactor as array
     switch(gclk){
         case GCLK_0:
             clockGenCtrlGen = GCLK_CLKCTRL_GEN_GCLK0;
@@ -212,7 +207,6 @@ template <class TimerRegisters> void Samd21TimerClass::setTimerRegisters(TimerNu
     TC->CTRLA.reg |= params->modeCount;
     TC->CTRLA.reg |= TC_CTRLA_WAVEGEN_MFRQ;
     TC->CTRLA.reg |= params->prescaler;
-    //TC->CTRLA.reg |= TC_CTRLA_ENABLE;
 
 
 
@@ -244,7 +238,6 @@ template <class TimerRegisters> bool Samd21TimerClass::isSyncing(TimerRegisters 
 
 
 void Samd21TimerClass::setNVIC(TimerNumberSamd21 timer, uint8_t priority){
-    //refactor as array
     IRQn_Type irqn;
     switch(timer){
         case TIMER_3:
@@ -274,7 +267,6 @@ template <class TimerRegisters> void Samd21TimerClass::setTimerBit(TimerRegister
 
 void Samd21TimerClass::setCallback(TimerNumberSamd21 timer, void(*callback)()){
 
-    //refactor as array of callbacks
     switch (timer) {
         case TIMER_3:
             this->callbacks.timer_3_routine = callback;
@@ -295,50 +287,6 @@ void Samd21TimerClass::disable(TimerNumberSamd21 timer){
     TC->CTRLA.reg &= ~TC_CTRLA_ENABLE;
     while (this->isSyncing(TC));
 }
-
-
-
-
-void Samd21TimerClass::disableCheck(){
-    this->_disableCheck = true;
-}
-
-
-bool Samd21TimerClass::isCheckEnabled(){
-    return !(this->_disableCheck);
-}
-
-
-
-
-
-bool CheckerSamd21::checkResolution(TimerNumberSamd21 timer, TimerResolutionSamd21 res){
-    if(res == RESOLUTION_32_BIT && timer == TIMER_3)
-        return false;
-    else
-        return true;
-}
-
-bool CheckerSamd21::checkFrequency(double freq, TimerResolutionSamd21 res){
-    if(res == RESOLUTION_16_BIT && freq < 0.75 )
-        return false;
-    if(res == RESOLUTION_32_BIT && freq < 0.000011)
-        return false;
-    return true;
-}
-
-bool CheckerSamd21::checkCompatibility(TimerFlagsSamd21 timerinfo[]){
-    if(timerinfo[TIMER_4].res == RESOLUTION_32_BIT && timerinfo[TIMER_5].isActive == true && timerinfo[TIMER_4].isActive == true)
-        return false;
-    return true;
-}
-
-
-
-
-//refactor, define if timer exist
-//refactor, define a parametric handler what will be called by each handler
-
 
 
 

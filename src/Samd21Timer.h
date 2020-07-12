@@ -1,24 +1,8 @@
 #include <Arduino.h>
 #ifndef _SAMD21_TIMER_
 #define _SAMD21_TIMER_
-// Used StaticAssert as a specialization of bool template instead of built-in one in order to grant 
-// back compatibility with old standards
-template <bool b>
-struct StaticAssert {};
-
-template <>
-struct StaticAssert<true> {
-    static void assert() {}
-};
 
 
-template <class TimerNumber, class TimerResolution, class TimerFlags>
-class IChecker {
-    public:
-        virtual bool checkResolution(TimerNumber timer, TimerResolution res) = 0;
-        virtual bool checkFrequency(double freq, TimerResolution res) = 0;
-        virtual bool checkCompatibility(TimerFlags timerFlags[]) = 0;
-};
 
 
 
@@ -36,15 +20,7 @@ class ITimer {
         virtual void enable(TimerNumber timer, float freq, void(*callback)(),  Priority priority, GeneralClock gclk) = 0;  //Automatic selection of the timer resolution 
         virtual void enable(TimerNumber timer, float freq, void(*callback)(), TimerResolution res, Priority priority, GeneralClock gclk) = 0; //Manual selection of timer resolution
         virtual void disable(TimerNumber timer) = 0;
-        virtual void disableCheck() = 0; //permit to use params that are unknown at compile time
-    protected:
-        virtual bool isCheckEnabled() = 0;
 }; 
-
-
-
-//refactor change timerinfo to timer flags array
-
 
 
 
@@ -61,7 +37,6 @@ class ITimer {
 
 
 #ifdef __SAMD21G18A__ 
-//refactor, change this macro with the built-in one
 #define SAMD21_CLK 48000000
 
 typedef enum{
@@ -108,20 +83,6 @@ typedef enum{
 
 
 
-class CheckerSamd21 : public IChecker<TimerNumberSamd21, TimerResolutionSamd21, TimerFlagsSamd21> {
-    public:
-        bool checkResolution(TimerNumberSamd21 timer, TimerResolutionSamd21 res);
-        bool checkFrequency(double freq, TimerResolutionSamd21 res);
-        bool checkCompatibility(TimerFlagsSamd21 timerinfo[]);
-};
-
-
-
-
-
-
-//refactor check unused template class
-
 class Samd21TimerClass : public ITimer<
     TimerNumberSamd21, 
     TimerResolutionSamd21, 
@@ -138,13 +99,9 @@ class Samd21TimerClass : public ITimer<
         void enable(TimerNumberSamd21 timer, float freq, void(*callback)(),  uint8_t priority = 0, GeneralClockSamd21 gclk = GCLK_5);  //Automatic selection of the timer resolution 
         void enable(TimerNumberSamd21 timer, float freq, void(*callback)(), TimerResolutionSamd21 res, uint8_t priority = 0, GeneralClockSamd21 gclk = GCLK_5); //Manual selection of timer resolution
         void disable(TimerNumberSamd21 timer);
-        void disableCheck(); //permit to use params that are unknown at compile time
         template <class TimerRegisters> void setTimerBit(TimerRegisters TC);     
 
     private:
-        bool _disableCheck = false;
-        CheckerSamd21 checker;
-        bool isCheckEnabled();
         TimerParamsSamd21 getTimerParams(float freq, TimerResolutionSamd21 res);
         void setGeneralClock(TimerNumberSamd21 timer, GeneralClockSamd21 gclk);
         template <class TimerRegisters> void setTimerRegisters(TimerNumberSamd21 timer, TimerRegisters TC, TimerParamsSamd21* params,  uint8_t priority, GeneralClockSamd21 gclk);
@@ -159,10 +116,6 @@ class Samd21TimerClass : public ITimer<
 
 
 
-
-extern void TCC0_Handler();
-extern void TCC1_Handler();
-extern void TCC2_Handler();
 extern void TC3_Handler();
 extern void TC4_Handler();
 extern void TC5_Handler();
