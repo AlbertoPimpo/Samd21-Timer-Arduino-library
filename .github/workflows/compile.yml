@@ -1,0 +1,50 @@
+name: Compile test
+
+on:  [push, pull_request]
+
+jobs:     
+  build-pio:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        example: [examples/empty_sketch.ino, examples/serial_blink.ino, examples/serial_timer.ino]
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: Set up Python
+      uses: actions/setup-python@v1
+      with:
+        repo-token: ${{ secrets.GITHUB_TOKEN }}
+
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install platformio
+
+    - name: Run PlatformIO
+      run: platformio ci --lib="." --board=zeroUSB
+      env:
+        PLATFORMIO_CI_SRC: ${{ matrix.example }}
+
+  # build-arduino:
+  #   runs-on: ${{ matrix.os }}
+  #   strategy:
+  #     matrix:
+  #       os: [ubuntu-latest, windows-latest]
+  #       example: [examples]
+
+  #   steps:
+  
+  #   - name: Setup Arduino CLI
+  #     uses: arduino/setup-arduino-cli@v1.0.0
+       
+
+  #   - name: Run Arduino CLI
+  #     run: |
+  #       arduino-cli core update-index
+  #       arduino-cli core install arduino:samd
+  #       arduino-cli board listall arduino_zero_native
+  #       echo "compiling ${{ matrix.example }}..."
+  #       arduino-cli compile --fqbn arduino:samd:arduino_zero_native ${{ matrix.example }}
