@@ -32,19 +32,17 @@ jobs:
 
 
 
- arduino:
-   runs-on: ubuntu-latest
+  arduino:
+    runs-on: ubuntu-latest
 
-   strategy:
-     matrix:
-       fqbn: [
-         "arduino:samd:zero"
-       ]
+    strategy:
+      matrix:
+        fqbn: ["arduino:samd:zero"]
 
-   steps:
-     - uses: actions/checkout@v1
-       with:
-         fetch-depth: 1
-     - uses: arduino/actions/libraries/compile-examples@master
-       with:
-         fqbn: ${{ matrix.fqbn }}
+    steps:
+      - uses: actions/checkout@v1
+        with:
+          fetch-depth: 1
+      - uses: arduino/actions/libraries/compile-examples@master
+        with:
+          fqbn: ${{ matrix.fqbn }}
