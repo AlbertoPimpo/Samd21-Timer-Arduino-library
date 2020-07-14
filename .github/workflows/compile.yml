@@ -37,7 +37,7 @@ jobs:
 
     strategy:
       matrix:
-        fqbn: ["arduino:samd:zero"]
+        fqbn: ["arduino:samd:arduino_zero_native"]
 
     steps:
       - uses: actions/checkout@v1
