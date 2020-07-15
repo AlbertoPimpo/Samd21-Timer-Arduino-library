@@ -8,7 +8,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest]
-        example: [examples/EmptySketch/empty_sketch.ino, examples/SerialBlink/serial_blink.ino, examples/SerialTimer/serial_timer.ino]
+        example: [examples/EmptySketch/EmptySketch.ino, examples/SerialBlink/SerialBlink.ino, examples/SerialTimer/SerialTimer.ino]
         boards: [zeroUSB]
 
     steps:
